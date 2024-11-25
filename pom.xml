@@ -1,0 +1,83 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>github.avinoamn</groupId>
+  <artifactId>spark-flat-udt</artifactId>
+  <version>1.0.0</version>
+
+  <properties>
+    <scala.major.version>2.12</scala.major.version>
+    <scala.minor.version>15</scala.minor.version>
+    <scala.version>${scala.major.version}.${scala.minor.version}</scala.version>
+
+    <spark.major.version>3.3</spark.major.version>
+    <spark.minor.version>1</spark.minor.version>
+    <spark.version>${spark.major.version}.${spark.minor.version}</spark.version>
+  </properties>
+
+    <build>
+      <plugins>
+        <plugin>
+          <groupId>net.alchim31.maven</groupId>
+          <artifactId>scala-maven-plugin</artifactId>
+          <version>4.9.2</version>
+          <executions>
+            <execution>
+              <id>scalac</id>
+              <goals>
+                <goal>compile</goal>
+              </goals>
+              <configuration>
+                <compilerPlugins>
+                  <compilerPlugin>
+                    <groupId>org.scalamacros</groupId>
+                    <artifactId>paradise_${scala.version}</artifactId>
+                    <version>2.1.1</version>
+                  </compilerPlugin>
+                </compilerPlugins>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <configuration>
+            <source>8</source>
+            <target>8</target>
+          </configuration>
+        </plugin>
+      </plugins>
+    </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>${scala.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-catalyst_${scala.major.version}</artifactId>
+      <version>${spark.version}</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
+
+  <repositories>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo1.maven.org/maven2/</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>
