@@ -66,19 +66,17 @@ Create a factory to generate `FlatUDTType` instances for each supported type in 
 ```scala
 import github.avinoamn.spark.sql.UDT.flat.{FlatUDTType, FlatUDTTypeFactory}
 
-import org.apache.spark.sql.catalyst.ScalaReflection
-
-class PropertyTypeFactory extends FlatUDTTypeFactory[Property] {
+object PropertyTypeFactory extends FlatUDTTypeFactory[Property] {
   override val typesCount: Int = 4
 
-  override def defaultCtor[V: ScalaReflection.universe.TypeTag]: Option[V => Property] = Some {
+  override def defaultCtor[V]: Option[V => Property] = Some {
     case v: String  => Left(Left(v))
     case v: Boolean => Left(Right(v))
     case v: Long    => Right(Left(v))
     case v: Double  => Right(Right(v))
   }
 
-  override def defaultDtor[V: ScalaReflection.universe.TypeTag]: Option[Property => Option[V]] = Some {
+  override def defaultDtor[V]: Option[Property => Option[V]] = Some {
     case Left(Left(v: V))  => Some(v)
     case Left(Right(v: V)) => Some(v)
     case Right(Left(v: V)) => Some(v)
@@ -95,17 +93,21 @@ Create a UDT class that uses the factory to define a schema and serialization lo
 
 ```scala
 import github.avinoamn.spark.sql.UDT.flat.{FlatUDT, FlatUDTType}
-import org.apache.spark.sql.types.{DataType, StructType}
+import org.apache.spark.sql.types.UDTRegistration
 
 class PropertyUDT extends FlatUDT[Property] {
-  private val factory = new PropertyFactory
+  override def types: Array[FlatUDTType[Property, _]] = PropertyUDT.types
+}
 
-  override def types: Array[FlatUDTType[Property, _]] = Array(
-    factory.createType[String](),
-    factory.createType[Boolean](),
-    factory.createType[Long](),
-    factory.createType[Double]()
-  )
+object PropertyUDT {
+   val types: Array[FlatUDTType[Property, _]] = Array(
+      PropertyFactory.createType[String](),
+      PropertyFactory.createType[Boolean](),
+      PropertyFactory.createType[Long](),
+      PropertyFactory.createType[Double]()
+   )
+
+   def register(): Unit = UDTRegistration.register(classOf[Property].getName, classOf[PropertyUDT].getName)
 }
 ```
 
@@ -115,27 +117,30 @@ class PropertyUDT extends FlatUDT[Property] {
 Now, you can register and use the UDT in your Spark application.
 
 ```scala
+case class Data(property: Property)
+
 object MainApp {
   def main(args: Array[String]): Unit = {
     val spark = SparkSession.builder()
-      .appName("FlatUDT Example")
+      .appName("PropertyUDT Example")
       .master("local[*]")
       .getOrCreate()
 
-    import spark.implicits._
+     // Register the UDT
+     PropertyUDT.register()
 
-    UDTRegistration.register(classOf[Property].getName, classOf[PropertyUDT].getName)
+     import spark.implicits._
 
     // Sample data
-    val data: Seq[Property] = Seq(
-      Left(Left("example string")),
-      Left(Right(true)),
-      Right(Left(123L)),
-      Right(Right(45.67))
+    val data: Seq[Data] = Seq(
+      Data(Left(Left("example string"))),
+      Data(Left(Right(true))),
+      Data(Right(Left(123L))),
+      Data(Right(Right(45.67)))
     )
 
     // Convert data to Dataset
-    val ds: Dataset[Property] = data.toDS()
+    val ds: Dataset[Data] = data.toDS()
     ds.show()
 
     // Serialize data using UDT
