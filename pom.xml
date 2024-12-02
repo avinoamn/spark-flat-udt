@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>github.avinoamn</groupId>
-  <artifactId>spark-flat-udt</artifactId>
+  <artifactId>spark-flat-udt_${spark.major.version}_${scala.major.version}</artifactId>
   <version>1.0.0</version>
 
   <properties>
@@ -10,8 +10,8 @@
     <scala.minor.version>15</scala.minor.version>
     <scala.version>${scala.major.version}.${scala.minor.version}</scala.version>
 
-    <spark.major.version>3.3</spark.major.version>
-    <spark.minor.version>1</spark.minor.version>
+    <spark.major.version>3.5</spark.major.version>
+    <spark.minor.version>3</spark.minor.version>
     <spark.version>${spark.major.version}.${spark.minor.version}</spark.version>
   </properties>
 

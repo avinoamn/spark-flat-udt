@@ -25,7 +25,7 @@ For Maven users, add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
    <groupId>github.avinoamn</groupId>
-   <artifactId>spark-flat-udt</artifactId>
+   <artifactId>spark-flat-udt_${spark.major.version}_${scala.major.version}</artifactId>
    <version>1.0.0</version>
    <scope>compile</scope>
 </dependency>
